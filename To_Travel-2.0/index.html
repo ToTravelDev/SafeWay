@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Travel</title>
+</head>
+<body>
+    <header>
+        <div class="lg-principal">
+            <img src="Imagens/logo/Logo-To-Travel-header.png" alt="Logo-principal" width="150">
+        </div>
+        <div class="menu">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#">Contatos</a></li>
+            </ul>
+        </div>
+        <div class="btn">
+            <a href="Login-Register.html"><button type="button" class="btn-login">Login</button></a>
+            <a href="Login-Register.html"><button type="button" class="btn-register">Registre-se</button></a>
+        </div>
+    </header>
+    <section>
+        <article class="conteudo">
+            <a href="Solicitação.html"><button type="button" id="btn-viagem">SOLICITE SUA VIAGEM AGORA</button></a>
+        </article>
+    </section>
+    <section class="setor1">
+        <article class="conteudo2">
+                <div class="txt-esquerda">
+                    <h1><strong>Viaje para onde e quando quiser!</strong></h1>
+                    <h4>Personalize sua viagens. Escolha origem, destino e veículo de preferência.</h4>
+                </div>
+                <div class="img-direita">
+                    <img src="Imagens/home-img/casal-kombi.png" alt="casal" width="98%">
+                </div>
+        </article>
+    </section>
+    <section class="setor2">
+        <article class="conteudo3">
+            <div class="img-esquerda">
+                <img src="Imagens/home-img/passageiros.png" alt="passageiros" width="98%">
+            </div>
+            <div class="txt-direita">
+                <h1><strong>Viagens para grupos fechados.</strong></h1>
+                <h4>Escolha a quantidade de passageiros que irão viajar, e evite cancelamento por falta de demanda!</h4>
+            </div>
+        </article>
+    </section>
+    <section class="setor3">
+        <article class="conteudo3">
+            <div class="txt-esquerda">
+                <h1><strong>Personalize sua viagem.</strong></h1>
+                <h4>Possibilidade de escolher se o veículo que realizará sua viagem possuirá wifi, ar-condicionado, assentos especias entre outras opções que atendam sua necessidade.</h4>
+            </div>
+            <div class="img-direita">
+                <img src="Imagens/home-img/Wifi.png" alt="Wifi" width="98%">
+            </div>
+        </article>
+    </section>
+    <footer class="rodape">
+        <div class="pgmt">
+            <h3 style="margin-left: 15px;">Método de pagamento</h3>
+        </div>
+        <div class="cartao">
+            <p style="margin-top: 10px;">Cartão de Crédito - Pix - Boleto </p>
+            <img src="Imagens/footer/pagamento.png" alt="pagamento" width="200">
+        </div>
+        <div class="lg-final">
+            <img src="Imagens/logo/Logo-To-Travel-header.png" alt="Logo-final" width="150">
+        </div>
+    </footer>
+</body>
+</html>
+
+<script>
+   
+
+const contentSections = document.querySelectorAll('.conteudo2, .conteudo3');
+
+function handleScroll() {
+    const windowHeight = window.innerHeight;
+
+    contentSections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        const sectionBottom = section.getBoundingClientRect().bottom;
+
+        if (sectionTop < windowHeight * 0.75 && sectionBottom > 0) {
+            section.classList.add('animate');
+        } else {
+            section.classList.remove('animate');
+        }
+    });
+}
+
+contentSections.forEach(section => {
+    section.classList.remove('animate');
+});
+
+window.addEventListener('scroll', handleScroll);
+window.addEventListener('load', handleScroll);
+
+
+const loginButton = document.getElementById('btn-login');
+
+loginButton.addEventListener('click', function() {
+    signupForm.style.display = 'block';
+	loginForm.style.display = 'none';
+        });
+</script>
+
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Public+Sans:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300&display=swap');
+@import url('https://fonts.cdnfonts.com/css/landasansdemo01');
+@import url('https://fonts.cdnfonts.com/css/disordered');
+
+* , html{
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    background-color: #fff;
+    font-family: 'DisorderedBold', sans-serif;                                              
+}
+
+header{
+    background-color: #66BFFF;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Felona st', sans-serif;                                                                                      
+}
+
+.menu ul li{
+    display: inline-block;
+    list-style: none;
+    padding: 1.2em;
+}
+.menu a{
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.menu a:hover{
+    color: #ffffff;
+}
+
+.btn-login{
+    background-color: #2386cc;
+    width: 4rem;
+    height: 1.5rem;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Frank Ruhl Libre', serif;
+    font-weight: bold;
+    color: #000;
+}
+
+.btn-login:hover{
+    cursor: pointer;
+    background-color: #1a70ad;
+}
+
+.btn-register{
+    background-color: #2386cc;
+    width: 5rem;
+    height: 1.5rem;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Felona st', sans-serif;
+    font-weight: bold;
+    color: #000;
+    margin-right: 10px
+}
+
+.btn-register:hover{
+    cursor: pointer;
+    background-color: #1a70ad;
+}
+
+.conteudo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4.5rem;
+}
+
+#btn-viagem{
+    background-color: #66BFFF;
+    font-weight: bold;
+    padding: 5px;
+    border: none;
+    border-radius: 15px;
+    height: 2rem;
+    width: 15rem;
+   font-family: 'Frank Ruhl Libre', serif;
+}
+
+#btn-viagem:hover{
+    cursor: pointer;
+    background-color:#4d9ed8;
+}
+
+.setor1 , .setor2 , .setor3{
+    margin-top: 15vh;
+}
+
+.conteudo2 , .conteudo3{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Public Sans";
+}
+
+.txt-esquerda{
+    padding-left: 2.5em;
+    
+}
+
+.conteudo2 h1 , .conteudo3 h1{
+    max-width: 12em;
+    font-weight:900;
+    font-size: 20pt;
+}
+
+.conteudo2 h4 , .conteudo3 h4{
+    margin-top: 20px;
+    max-width: 22em;
+    
+}
+
+.img-direita{
+    margin-left: 3rem;
+}
+
+.conteudo3{
+    padding-top: 3vh;
+}
+.img-esquerda{
+    margin-left: 2rem;
+    margin-right: 2.5em;
+}
+
+.txt-direita h4{
+    text-align: justify;
+}
+
+.txt-direita{
+    margin-right: 15px;
+}
+
+.conteudo3 h4{
+    text-align: justify;
+}
+
+.rodape{
+    margin-top: 15rem;
+    background-color: #66BFFF;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Public Sans';
+}
+
+.pgmt{
+    font-family: 'Public Sans';
+    font-size: 10pt;
+}
+
+.conteudo2,
+.conteudo3 {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+
+.animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.conteudo2.animate {
+    animation: slideInFromLeft 1s ease forwards;
+}
+
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+.conteudo3.animate {
+    animation: fadeIn 1s ease forwards;
+}
+</style>
