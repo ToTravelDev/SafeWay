@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Directions Service</title>
+  <style>
+    #map-container {
+      display: flex;
+    }
+    #map {
+      flex: 1;
+      height: 100vh;
+    }
+    #search-container {
+      flex: 1;
+      padding: 20px;
+    }
+    #floating-panel {
+      background-color: #fff;
+      padding: 10px;
+      border: 1px solid #999;
+      text-align: center;
+      font-family: 'Roboto', 'sans-serif';
+      line-height: 30px;
+    }
+    #directions-container {
+      margin-top: 20px;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border: 1px solid #999;
+    }
+  </style>
+</head>
+<body>
+  <div id="map-container">
+    <div id="map"></div>
+    <div id="search-container">
+      <div id="floating-panel">
+        <b>Endereço de partida: </b>
+        <span id="start">Sua localização</span>
+        <br>
+        <b>Escola: </b>
+        <select id="escola">
+          <option value="" selected disabled>Escolha a escola</option>
+          <option value="dom_pedro">Escola Dom Pedro</option>
+          <option value="dom_bosco">Escola Dom Bosco</option>
+        </select>
+        <br>
+        <div id="tempo-viagem"></div>
+        <br>
+        <button onclick="iniciarViagem()">Iniciar Viagem</button>
+      </div>
+      <div id="directions-container">
+        <div id="directions-panel"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var map;
+    var directionsService;
+    var directionsRenderer;
+    var directionsDisplay;
+    var polyline;
+
+    function initMap() {
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer();
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 7,
+        center: {lat: -23.6391658782959, lng: -46.8056640625} // Sua localização padrão
+      });
+      directionsRenderer.setMap(map);
+
+      directionsDisplay = new google.maps.DirectionsRenderer({
+        map: map,
+        panel: document.getElementById('directions-panel')
+      });
+
+      // Obtenha a localização do usuário com maior precisão usando o serviço de geolocalização do Google Maps
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          // Defina a posição do usuário como o ponto de partida
+          document.getElementById('start').innerHTML = 'Sua localização';
+          document.getElementById('start').setAttribute('data-lat', pos.lat);
+          document.getElementById('start').setAttribute('data-lng', pos.lng);
+
+          // Atualize o centro do mapa para a localização do usuário
+          map.setCenter(pos);
+        }, function() {
+          handleLocationError(true, infoWindow, map.getCenter());
+        }, { enableHighAccuracy: true }); // Opção para maior precisão
+      } else {
+        // O navegador não suporta Geolocalização
+        handleLocationError(false, infoWindow, map.getCenter());
+      }
+    }
+
+    function iniciarViagem() {
+      var escola = document.getElementById('escola').value;
+      var enderecos = getEnderecos(escola);
+
+      var waypoints = [];
+      for (var i = 0; i < enderecos.length; i++) {
+        waypoints.push({location: enderecos[i], stopover: true});
+      }
+
+      var startLat = parseFloat(document.getElementById('start').getAttribute('data-lat'));
+      var startLng = parseFloat(document.getElementById('start').getAttribute('data-lng'));
+
+      directionsService.route({
+        origin: {lat: startLat, lng: startLng}, // Sua localização
+        destination: enderecos[enderecos.length - 1], // Último endereço na lista é o destino final
+        waypoints: waypoints,
+        optimizeWaypoints: true,
+        travelMode: 'DRIVING'
+      }, function(response, status) {
+        if (status === 'OK') {
+          var path = response.routes[0].overview_path;
+          if (polyline) {
+            polyline.setMap(null);
+          }
+          animatePath(path);
+
+          var totalDuration = 0;
+          var legs = response.routes[0].legs;
+          for (var i = 0; i < legs.length; i++) {
+            totalDuration += legs[i].duration.value;
+          }
+          var horas = Math.floor(totalDuration / 3600);
+          var minutos = Math.round((totalDuration % 3600) / 60);
+          document.getElementById('tempo-viagem').innerHTML = '<b>Tempo de viagem total: </b>' + horas + ' horas e ' + minutos + ' minutos';
+
+          directionsRenderer.setDirections(response);
+          directionsDisplay.setDirections(response);
+        } else {
+          window.alert('Directions request failed due to ' + status);
+        }
+      });
+    }
+
+    function animatePath(path) {
+      var delay = 50;
+      var i = 0;
+      var length = path.length;
+      polyline = new google.maps.Polyline({
+        path: [],
+        geodesic: true,
+        strokeColor: '#000000',
+        strokeOpacity: 1,
+        strokeWeight: 4,
+        map: map
+      });
+      var timer = window.setInterval(function() {
+        if (i < length) {
+          var segment = path[i];
+          polyline.getPath().push(segment);
+          i++;
+        } else {
+          window.clearInterval(timer);
+        }
+      }, delay);
+    }
+
+    function getEnderecos(escola) {
+      var enderecos = {
+        'dom_pedro': [
+          {lat: -23.640000, lng: -46.806000}, // Ponto A
+          {lat: -23.638000, lng: -46.804000}, // Ponto B
+          {lat: -23.639500, lng: -46.805500},  // Ponto C
+          {lat: -23.637000, lng: -46.804500}, // Ponto D
+          {lat: -23.639000, lng: -46.806000} // Ponto E
+        ],
+        'dom_bosco': [
+          {lat: -23.640100, lng: -46.806100}, // Ponto A
+          {lat: -23.638100, lng: -46.804100}, // Ponto B
+          {lat: -23.639600, lng: -46.805600},  // Ponto C
+          {lat: -23.637100, lng: -46.804600}, // Ponto D
+          {lat: -23.640100, lng: -46.807000} // Ponto E
+        ]
+      };
+      return enderecos[escola];
+    }
+
+    // Função para adicionar novo ponto ao mapa com base no cadastro
+    function adicionarNovoPonto(nome, endereco) {
+      var escola = document.getElementById('escola').value;
+      var enderecos = getEnderecos(escola);
+      enderecos.push(endereco);
+
+      // Atualiza o mapa para incluir o novo ponto
+      directionsService.route({
+        origin: {lat: -23.6391658782959, lng: -46.8056640625}, // Sua localização
+        destination: endereco, // Novo ponto adicionado
+        travelMode: 'DRIVING'
+      }, function(response, status) {
+        if (status === 'OK') {
+          directionsRenderer.setDirections(response);
+          directionsDisplay.setDirections(response);
+        } else {
+          window.alert('Directions request failed due to ' + status);
+        }
+      });
+    }
+  </script>
+
+  <!-- Inclua a biblioteca do Google Maps com a chave de API fornecida -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLTWBH72nZp1HhCFdCd3iZgiSiLkSAAvo&callback=initMap" async defer ></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLTWBH72nZp1HhCFdCd3iZgiSiLkSAAvo&callback=initMap"async defer></script>
+
+
+
+
+
+1-Precisamos integrar uma api para enviar os dados da tela cadastro para uma api, depois ser consumida na tela viagem, aonde vamos pegar as informações para criar novos marcadores, com o endereço, nome e telefone de contado do aluno cadastrado 
+
+2-Converter isso para mobile

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Perfil do Usuário</title>
+  <style>
+    /* Estilos CSS */
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .form-group input[type="password"],
+    .form-group input[type="text"] {
+      width: calc(100% - 100px);
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .form-group input[type="password"] {
+      font-family: monospace;
+    }
+    .form-group button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+    .form-group button.active {
+      display: block;
+    }
+    .password-reset-form {
+      display: none;
+    }
+    .password-reset-form.active {
+      display: block;
+    }
+    .error-message {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Perfil do Usuário</h2>
+    <div class="form-group">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" value="João da Silva" oninput="checkFields()">
+    </div>
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" id="email" value="joao@example.com" oninput="checkFields()">
+    </div>
+    <div class="form-group">
+      <label for="telefone">Telefone:</label>
+      <input type="text" id="telefone" value="(11) 1234-5678" oninput="checkFields()">
+    </div>
+    <div class="form-group">
+      <label for="senha">Senha:</label>
+      <input type="password" id="senha" value="senha123" disabled>
+      <button class="active" onclick="redefinirSenha()">Redefinir Senha</button>
+    </div>
+    <div class="password-reset-form" id="password-reset-form">
+      <div class="form-group">
+        <label for="senha-atual">Senha Atual:</label>
+        <input type="password" id="senha-atual" oninput="checkFields()">
+      </div>
+      <div class="form-group">
+        <label for="nova-senha">Nova Senha:</label>
+        <input type="password" id="nova-senha" oninput="checkFields()">
+      </div>
+      <div class="form-group">
+        <label for="confirmar-senha">Repetir Senha:</label>
+        <input type="password" id="confirmar-senha" oninput="checkFields()">
+      </div>
+      <div class="form-group">
+        <button id="salvar-button" onclick="salvarNovaSenha()">Salvar</button>
+      </div>
+      <div class="error-message" id="error-message"></div>
+    </div>
+  </div>
+
+  <script>
+    var initialValues = {
+      nome: "João da Silva",
+      email: "joao@example.com",
+      telefone: "(11) 1234-5678"
+    };
+    var fieldsChanged = false;
+
+    function redefinirSenha() {
+      var passwordResetForm = document.getElementById('password-reset-form');
+      passwordResetForm.classList.toggle('active');
+      document.getElementById('error-message').innerText = ''; // Limpa a mensagem de erro ao abrir o formulário
+      checkFields(); // Atualiza o status do botão Salvar ao abrir o formulário
+    }
+
+    function checkFields() {
+      fieldsChanged = true;
+      var saveButton = document.getElementById('salvar-button');
+      saveButton.classList.add('active');
+    }
+
+    function salvarNovaSenha() {
+      if (!fieldsChanged) {
+        return; // Não faz nada se nenhum campo foi alterado
+      }
+
+      var senhaAtual = document.getElementById('senha-atual').value;
+      var novaSenha = document.getElementById('nova-senha').value;
+      var confirmarSenha = document.getElementById('confirmar-senha').value;
+      var senhaCadastrada = "senha123"; // Senha cadastrada (exemplo)
+
+      if (senhaAtual !== senhaCadastrada) {
+        document.getElementById('error-message').innerText = 'Senha atual incorreta.';
+        return;
+      }
+
+      if (novaSenha !== confirmarSenha) {
+        document.getElementById('error-message').innerText = 'As novas senhas não coincidem.';
+        return;
+      }
+
+      // Aqui você pode adicionar a lógica para salvar a nova senha do usuário no servidor.
+      console.log('Nova senha: ' + novaSenha);
+      // Resetar campos
+      document.getElementById('senha-atual').value = '';
+      document.getElementById('nova-senha').value = '';
+      document.getElementById('confirmar-senha').value = '';
+      document.getElementById('error-message').innerText = '';
+      document.getElementById('password-reset-form').classList.remove('active');
+      document.getElementById('salvar-button').classList.remove('active');
+      fieldsChanged = false; // Reseta o status dos campos alterados
+    }
+  </script>
+</body>
+</html>
