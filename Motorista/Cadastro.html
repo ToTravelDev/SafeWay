@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Aluno</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        width: 80%;
+        margin: auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    input, select {
+        width: 100%;
+        margin: 5px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cadastro de Aluno</h1>
+    <form id="cadastro-form">
+        <input type="text" id="nome" placeholder="Nome" required><br>
+        <input type="number" id="idade" placeholder="Idade" required><br>
+        <input type="tel" id="telefone" placeholder="Telefone para contato" maxlength="15" required><br>
+        <select id="periodo" required>
+            <option value="">Selecione o período</option>
+            <option value="manha">Manhã</option>
+            <option value="tarde">Tarde</option>
+        </select><br>
+        <input type="text" id="cep" placeholder="CEP" required><br>
+        <input type="text" id="rua" placeholder="Rua" readonly><br>
+        <input type="text" id="bairro" placeholder="Bairro" readonly><br>
+        <input type="text" id="cidade" placeholder="Cidade" readonly><br>
+        <input type="text" id="estado" placeholder="Estado" readonly><br>
+        <input type="number" id="numero" placeholder="Número" required><br>
+        <input type="text" id="referencia" placeholder="Ponto de Referência"><br>
+        <select id="escola" required>
+            <option value="" disabled selected>Selecione a escola</option>
+            <option value="dom_pedro">Escola Dom Pedro</option>
+            <option value="dom_bosco">Escola Dom Bosco</option>
+        </select><br>
+        <button type="submit">Cadastrar</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('cep').addEventListener('blur', function() {
+        var cep = this.value.replace(/\D/g, '');
+
+        if (cep.length != 8) {
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://viacep.com.br/ws/' + cep + '/json/');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var endereco = JSON.parse(xhr.responseText);
+                    document.getElementById('rua').value = endereco.logradouro;
+                    document.getElementById('bairro').value = endereco.bairro;
+                    document.getElementById('cidade').value = endereco.localidade;
+                    document.getElementById('estado').value = endereco.uf;
+                }
+            }
+        };
+        xhr.send();
+    });
+
+    // Formatando o campo de telefone
+    document.getElementById('telefone').addEventListener('input', function() {
+        var telefone = this.value.replace(/\D/g, ''); // Remove todos os caracteres não numéricos
+        var formattedPhone = '';
+
+        if (telefone.length > 2) {
+            formattedPhone = '(' + telefone.substring(0, 2) + ')';
+            if (telefone.length > 2 && telefone.length <= 7) {
+                formattedPhone += telefone.substring(2, 7);
+            } else if (telefone.length > 7) {
+                formattedPhone += telefone.substring(2, 7) + '-' + telefone.substring(7, 11);
+            }
+        } else {
+            formattedPhone = telefone;
+        }
+
+        this.value = formattedPhone;
+    });
+
+    // Submete o formulário de cadastro
+    document.getElementById("cadastro-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Evita o comportamento padrão de envio do formulário
+
+        // Obtenha os valores do formulário
+        var nome = document.getElementById("nome").value;
+        var idade = document.getElementById("idade").value;
+        var periodo = document.getElementById("periodo").value;
+        var rua = document.getElementById("rua").value;
+        var bairro = document.getElementById("bairro").value;
+        var cidade = document.getElementById("cidade").value;
+        var estado = document.getElementById("estado").value;
+        var numero = document.getElementById("numero").value;
+        var referencia = document.getElementById("referencia").value;
+        var escola = document.getElementById("escola").value;
+
+        // Exibindo os dados para fins de exemplo
+        console.log("Nome:", nome);
+        console.log("Idade:", idade);
+        console.log("Período:", periodo);
+        console.log("Rua:", rua);
+        console.log("Bairro:", bairro);
+        console.log("Cidade:", cidade);
+        console.log("Estado:", estado);
+        console.log("Número:", numero);
+        console.log("Referência:", referencia);
+        console.log("Escola:", escola);
+
+        // Limpa o formulário após o envio
+        document.getElementById("cadastro-form").reset();
+    });
+</script>
+
+</body>
+</html>
