@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Modal, Keyboard } from 'react-native';
 
+
 const CadastroAluno = () => {
   const [cep, setCep] = useState('');
   const [rua, setRua] = useState('');

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Modal } from 'react-native';
 
+
 const CadastroEscola = () => {
   const [cep, setCep] = useState('');
   const [rua, setRua] = useState('');

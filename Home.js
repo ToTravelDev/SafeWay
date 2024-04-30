@@ -1,18 +1,26 @@
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import Cadastro from './Cadastro';
+import Perfil from './Editar_Perfil';
+import CadastroEscola from './Cadastro_Escola'; 
+import CadastroAluno from './Cadastro_Aluno';
 
-const WelcomeScreen = () => {
+const Stack = createStackNavigator();
+
+const WelcomeScreen = ({ navigation }) => {
 
   const mostrarPerfil = () => {
-    // Lógica para navegar para a tela de perfil
+    navigation.navigate('Perfil');
   }
 
   const mostrarViagem = () => {
-    // Lógica para navegar para a tela de viagem
+    navigation.navigate('Viagem');
   }
 
   const mostrarCadastro = () => {
-    // Lógica para navegar para a tela de cadastro
+    navigation.navigate('Cadastro');
   }
 
   return (
@@ -33,6 +41,21 @@ const WelcomeScreen = () => {
         </TouchableOpacity>
       </View>
     </View>
+  );
+}
+
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Início" component={WelcomeScreen} />
+        <Stack.Screen name="Cadastro" component={Cadastro} />
+        <Stack.Screen name="Perfil" component={Perfil} />
+        <Stack.Screen name="CadastroEscola" component={CadastroEscola} />
+        <Stack.Screen name="CadastroAluno" component={CadastroAluno} /> 
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -64,6 +87,11 @@ const styles = StyleSheet.create({
   iconText: {
     marginTop: 5,
   },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
-export default WelcomeScreen;
+export default App;
