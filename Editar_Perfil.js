@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Image, TouchableOpacity, ScrollView } from 'react-native';
 
-
-
 const PerfilScreen = () => {
     const initialValues = {
         nome: "João da Silva",
@@ -19,7 +17,7 @@ const PerfilScreen = () => {
     const [fieldsChanged, setFieldsChanged] = useState(false);
     const [showNovaSenha, setShowNovaSenha] = useState(false);
     const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
-    const [editMode, setEditMode] = useState(false);
+    const [editMode, setEditMode] = useState(false); // Estado para controlar o modo de edição
 
     const redefinirSenha = () => {
         setShowPasswordResetForm(!showPasswordResetForm);
@@ -100,9 +98,9 @@ const PerfilScreen = () => {
                     value={fields.nome}
                     onChangeText={value => {
                         setFields({ ...fields, nome: value });
-                        checkFields();
+                        checkFields(); // Ativar estado de campos alterados
                     }}
-                    editable={editMode}
+                    editable={editMode} // Definir se o campo é editável ou não com base no modo de edição
                 />
             </View>
             <View style={styles.formGroup}>
@@ -112,7 +110,7 @@ const PerfilScreen = () => {
                     value={fields.email}
                     onChangeText={value => {
                         setFields({ ...fields, email: value });
-                        checkFields(); 
+                        checkFields(); // Ativar estado de campos alterados
                     }}
                     editable={editMode}
                 />
@@ -124,7 +122,7 @@ const PerfilScreen = () => {
                     value={fields.telefone}
                     onChangeText={value => {
                         setFields({ ...fields, telefone: value });
-                        checkFields(); 
+                        checkFields(); // Ativar estado de campos alterados
                     }}
                     editable={editMode}
                 />

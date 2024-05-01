@@ -1,15 +1,7 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import Cadastro from './Cadastro';
-import Perfil from './Editar_Perfil';
-import CadastroEscola from './Cadastro_Escola'; 
-import CadastroAluno from './Cadastro_Aluno';
 
-const Stack = createStackNavigator();
-
-const WelcomeScreen = ({ navigation }) => {
+const WelcomeScreen = ({ navigation , userInfo  }) => {
 
   const mostrarPerfil = () => {
     navigation.navigate('Perfil');
@@ -25,7 +17,7 @@ const WelcomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.welcomeContainer}>
-      <Text style={styles.welcomeTitle}>Bem-vindo motorista</Text>
+      <Text style={styles.welcomeTitle}>Bem-vindo {userInfo.name}</Text>
       <View style={styles.iconContainer}>
         <TouchableOpacity style={styles.icon} onPress={mostrarPerfil}>
           <Image source={require('./assets/perfil_icon.png')} style={styles.iconImage} />
@@ -41,21 +33,6 @@ const WelcomeScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </View>
-  );
-}
-
-
-const App = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Início" component={WelcomeScreen} />
-        <Stack.Screen name="Cadastro" component={Cadastro} />
-        <Stack.Screen name="Perfil" component={Perfil} />
-        <Stack.Screen name="CadastroEscola" component={CadastroEscola} />
-        <Stack.Screen name="CadastroAluno" component={CadastroAluno} /> 
-      </Stack.Navigator>
-    </NavigationContainer>
   );
 }
 
@@ -87,11 +64,6 @@ const styles = StyleSheet.create({
   iconText: {
     marginTop: 5,
   },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
 });
 
-export default App;
+export default WelcomeScreen;
