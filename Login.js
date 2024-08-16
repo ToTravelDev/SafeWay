@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TextInput } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,6 +9,9 @@ WebBrowser.maybeCompleteAuthSession();
 
 const Login = ({ navigation, setUserInfo }) => {
   const [userInfo, setUserInfoState] = React.useState(null);
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: '1024782208301-qdolc7nipej618h19cn5gg2umeesfmd7.apps.googleusercontent.com',
     iosClientId: '1024782208301-0fldioc8l3mic9aa7sq3vt7756ki5eo9.apps.googleusercontent.com',
@@ -46,7 +49,7 @@ const Login = ({ navigation, setUserInfo }) => {
       await AsyncStorage.setItem('@user', JSON.stringify(user));
       setUserInfoState(user);
       setUserInfo(user); // Set userInfo in App.js
-      navigation.navigate('Welcome');
+      navigation.navigate('Início');
     } catch (error) {
       console.error('Erro ao buscar informações do usuário:', error);
     }
@@ -54,6 +57,43 @@ const Login = ({ navigation, setUserInfo }) => {
 
   const handleLoginButtonPress = async () => {
     await promptAsync();
+  };
+
+  const handleDefaultLoginButtonPress = async () => {
+    if (username === 'Safe' && password === '1234') {
+      const user = {
+        name: username,
+        email: 'safeway@example.com',
+        picture: 'https://via.placeholder.com/150',
+      };
+
+      // Salve as informações do usuário no AsyncStorage
+      await AsyncStorage.setItem('@user', JSON.stringify(user));
+
+      // Atualize as informações do usuário no estado local do componente
+      setUserInfoState(user);
+
+      // Passe as informações do usuário para o componente pai (App.js)
+      setUserInfo(user);
+
+      // Navegue para a tela de boas-vindas
+      navigation.navigate('Início');
+    } else {
+      console.error('Nome de usuário ou senha incorretos');
+    }
+  };
+
+  const handleLogoutButtonPress = async () => {
+    // Limpe os dados de usuário do AsyncStorage
+    await AsyncStorage.removeItem('@user');
+    // Limpe os dados de usuário do estado local do componente
+    setUserInfoState(null);
+    // Limpe os dados de usuário do componente pai (App.js)
+    setUserInfo(null);
+  };
+
+  const handleCadastroButtonPress = () => {
+    navigation.navigate('Registro');
   };
 
   return (
@@ -65,18 +105,26 @@ const Login = ({ navigation, setUserInfo }) => {
             <Text>Usuário: {userInfo.name}</Text>
             <Text>Email: {userInfo.email}</Text>
           </View>
+          <Button title="Sair" onPress={handleLogoutButtonPress} />
         </View>
       )}
-      <Text>Code with vitor</Text>
       <Button title="Login com Google" onPress={handleLoginButtonPress} />
-      <Button
-        title="Sair"
-        onPress={() => {
-          AsyncStorage.removeItem('@user');
-          setUserInfo(null);
-          setUserInfoState(null);
-        }}
+      <Text>OU</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome de Usuário"
+        value={username}
+        onChangeText={setUsername}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        secureTextEntry={true}
+        value={password}
+        onChangeText={setPassword}
+      />
+      <Button title="Login Padrão" onPress={handleDefaultLoginButtonPress} />
+      <Button title="Cadastrar-se" onPress={handleCadastroButtonPress} />
       <StatusBar style="auto" />
     </View>
   );
@@ -112,6 +160,14 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     flex: 1,
+  },
+  input: {
+    width: '80%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
 });
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Modal } from 'react-native';
-
+import axios from 'axios';
 
 const CadastroEscola = () => {
   const [cep, setCep] = useState('');
@@ -10,11 +10,10 @@ const CadastroEscola = () => {
   const [estado, setEstado] = useState('');
   const [nomeEscola, setNomeEscola] = useState('');
   const [telefone, setTelefone] = useState('');
-  const [periodoManha, setPeriodoManha] = useState(false);
-  const [periodoTarde, setPeriodoTarde] = useState(false);
+  const [numero, setNumero] = useState('');
   const [cepDone, setCepDone] = useState(false);
   const [camposVazios, setCamposVazios] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+ 
 
   const handleCepBlur = () => {
     if (cep.length !== 8) {
@@ -40,14 +39,6 @@ const CadastroEscola = () => {
       });
   };
 
-  const handlePeriodoChange = (periodo) => {
-    if (periodo === 'manha') {
-      setPeriodoManha(!periodoManha);
-    } else if (periodo === 'tarde') {
-      setPeriodoTarde(!periodoTarde);
-    }
-  };
-
   const handleSubmit = () => {
     // Verificar se algum dos campos obrigatórios está vazio
     const camposObrigatorios = [{ nome: 'Nome da Escola', valor: nomeEscola }, { nome: 'CEP', valor: cep }];
@@ -59,31 +50,39 @@ const CadastroEscola = () => {
       return;
     }
 
-    // Implemente aqui a lógica para submeter o formulário
-    console.log('Nome da Escola:', nomeEscola);
-    console.log('Telefone:', telefone);
-    console.log('CEP:', cep);
-    console.log('Rua:', rua);
-    console.log('Bairro:', bairro);
-    console.log('Cidade:', cidade);
-    console.log('Estado:', estado);
-    console.log('Período Manhã:', periodoManha);
-    console.log('Período Tarde:', periodoTarde);
+    const dadosEscola = {
+      es_desc: nomeEscola,
+      es_ativo: true, 
+      es_cep: cep,
+      es_rua: rua,
+      es_numero: numero,
+      es_complemento: telefone
+    };
 
-    // Limpar os campos após o envio
-    setCep('');
-    setRua('');
-    setBairro('');
-    setCidade('');
-    setEstado('');
-    setNomeEscola('');
-    setTelefone('');
-    setPeriodoManha(false);
-    setPeriodoTarde(false);
-    setCepDone(false);
-    setCamposVazios([]);
+    // Fazer a requisição HTTP para a API
+    axios.post('http://10.0.2.2:3001/escola/store', dadosEscola)
+      .then(response => {
+        // Manipular a resposta, se necessário
+        console.log('Resposta da API:', response.data);
+        setCep('');
+        setRua('');
+        setBairro('');
+        setCidade('');
+        setEstado('');
+        setNomeEscola('');
+        setTelefone('');
+        setCepDone(false);
+        setCamposVazios([]);
+        // Exibir mensagem de sucesso
+        Alert.alert('Cadastro realizado com sucesso!');
+      })
+      .catch(error => {
+        // Tratar erros
+        console.error('Erro ao cadastrar escola:', error);
+        // Exibir mensagem de erro
+        Alert.alert('Erro', 'Ocorreu um erro ao cadastrar a escola. Por favor, tente novamente.');
+      });
   };
- 
   
   const formatPhoneNumber = (input) => {
     let phoneNumber = input.replace(/\D/g, '');
@@ -167,48 +166,18 @@ const CadastroEscola = () => {
               />
             </>
           )}
-          <TouchableOpacity style={styles.input} onPress={() => setModalVisible(true)}>
-            <Text style={styles.periodoButtonText}>
-              Período:
-              {periodoManha ? ' Manhã' : ''}
-              {periodoTarde ? ' Tarde' : ''}
-              {!periodoManha && !periodoTarde ? ' Selecione um período' : ''}
-            </Text>
-          </TouchableOpacity>
+        <TextInput
+  style={[styles.input, camposVazios.includes('Número') && styles.inputError]}
+  placeholder="Número"
+  value={numero}
+  onChangeText={setNumero}
+  keyboardType="numeric"
+  maxLength={5}
+  returnKeyType="done"
+/>
           <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text style={styles.buttonText}>Cadastrar</Text>
-          </TouchableOpacity>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              setModalVisible(false);
-            }}
-          >
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <TouchableOpacity
-                  style={[styles.modalButton, periodoManha && styles.selectedButton]}
-                  onPress={() => handlePeriodoChange('manha')}
-                >
-                  <Text style={styles.modalButtonText}>Manhã</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalButton, periodoTarde && styles.selectedButton]}
-                  onPress={() => handlePeriodoChange('tarde')}
-                >
-                  <Text style={styles.modalButtonText}>Tarde</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.modalButtonText}>Cancelar</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
+          </TouchableOpacity>      
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

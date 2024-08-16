@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const PerfilScreen = () => {
+const Perfil = ({ userInfo }) => {
     const initialValues = {
-        nome: "João da Silva",
-        email: "joao@example.com",
-        telefone: "(11) 1234-5678"
+        nome: userInfo.name ,
+        email: userInfo.email,
+        telefone: "(11)985658856"
     };
 
     const [fields, setFields] = useState(initialValues);
@@ -18,6 +19,8 @@ const PerfilScreen = () => {
     const [showNovaSenha, setShowNovaSenha] = useState(false);
     const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
     const [editMode, setEditMode] = useState(false); // Estado para controlar o modo de edição
+
+    const navigation = useNavigation();
 
     const redefinirSenha = () => {
         setShowPasswordResetForm(!showPasswordResetForm);
@@ -51,7 +54,7 @@ const PerfilScreen = () => {
         setErrorMessage('');
         setShowPasswordResetForm(false);
         setFieldsChanged(false);
-        setEditMode(false); // Voltar ao modo de visualização
+        setEditMode(false);
     };
 
     const toggleEditMode = () => {
@@ -67,9 +70,6 @@ const PerfilScreen = () => {
         }
         if (fields.email !== initialValues.email) {
             camposEditados.email = fields.email;
-        }
-        if (fields.telefone !== initialValues.telefone) {
-            camposEditados.telefone = fields.telefone;
         }
 
         // Lógica para enviar os campos editados (camposEditados)
@@ -119,12 +119,12 @@ const PerfilScreen = () => {
                 <Text style={styles.label}>Telefone:</Text>
                 <TextInput
                     style={styles.input}
-                    value={fields.telefone}
+                    value={fields.telefone} // Deixe o campo de telefone vazio
                     onChangeText={value => {
                         setFields({ ...fields, telefone: value });
                         checkFields(); // Ativar estado de campos alterados
                     }}
-                    editable={editMode}
+                    editable={false} // O campo de telefone não é editável
                 />
             </View>
             {editMode ? (
@@ -208,6 +208,10 @@ const PerfilScreen = () => {
                     <Text style={styles.errorMessage}>{errorMessage}</Text>
                 </View>
             )}
+            {/* Botão para voltar à tela inicial */}
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.backButtonText}>Voltar para Início</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 };
@@ -264,6 +268,16 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 10,
     },
+    backButton: {
+        backgroundColor: '#007bff',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    backButtonText: {
+        color: '#ffffff',
+        fontSize: 18,
+    },
 });
 
-export default PerfilScreen;
+export default Perfil;

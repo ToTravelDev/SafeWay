@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Modal, Keyboard } from 'react-native';
-
+import axios from 'axios';
 
 const CadastroAluno = () => {
   const [cep, setCep] = useState('');
@@ -13,20 +13,21 @@ const CadastroAluno = () => {
   const [telefone, setTelefone] = useState('');
   const [numero, setNumero] = useState('');
   const [referencia, setReferencia] = useState('');
+  const [cpf, setCpf] = useState(''); // Add state for CPF
   const [cepDone, setCepDone] = useState(false);
   const [camposVazios, setCamposVazios] = useState([]);
   const [modalEscolaVisible, setModalEscolaVisible] = useState(false);
   const [modalPeriodoVisible, setModalPeriodoVisible] = useState(false);
   const [escolaSelecionada, setEscolaSelecionada] = useState('');
   const [periodoSelecionado, setPeriodoSelecionado] = useState('');
-  
+  const [escolas, setEscolas] = useState([]); // State to store fetched schools
+
   const numeroInputRef = useRef(null);
 
   const handleCepBlur = () => {
     if (cep.length !== 8) {
       return;
     }
-
     fetch(`https://viacep.com.br/ws/${cep}/json/`)
       .then(response => response.json())
       .then(data => {
@@ -54,7 +55,17 @@ const CadastroAluno = () => {
   };
 
   const handleSubmit = () => {
-    const camposObrigatorios = [{ nome: 'Nome', valor: nome }, { nome: 'Idade', valor: idade }, { nome: 'Telefone', valor: telefone }, { nome: 'CEP', valor: cep }, { nome: 'Número', valor: numero }, { nome: 'Escola', valor: escolaSelecionada }, { nome: 'Período', valor: periodoSelecionado }];
+    // Verifica se todos os campos obrigatórios foram preenchidos
+    const camposObrigatorios = [
+      { nome: 'Nome', valor: nome },
+      { nome: 'Idade', valor: idade },
+      { nome: 'Telefone', valor: telefone },
+      { nome: 'CPF', valor: cpf },
+      { nome: 'CEP', valor: cep },
+      { nome: 'Número', valor: numero },
+      { nome: 'Escola', valor: escolaSelecionada },
+      { nome: 'Período', valor: periodoSelecionado }
+    ];
     const camposVazios = camposObrigatorios.filter(campo => !campo.valor.trim());
     setCamposVazios(camposVazios.map(campo => campo.nome));
 
@@ -63,36 +74,69 @@ const CadastroAluno = () => {
       return;
     }
 
-    console.log('Nome:', nome);
-    console.log('Idade:', idade);
-    console.log('Telefone:', telefone);
-    console.log('Período:', periodoSelecionado);
-    console.log('Rua:', rua);
-    console.log('Bairro:', bairro);
-    console.log('Cidade:', cidade);
-    console.log('Estado:', estado);
-    console.log('Número:', numero);
-    console.log('Referência:', referencia);
-    console.log('Escola:', escolaSelecionada);
+    axios.post('http://10.0.2.2:3001/usuario/store', {
+      usu_nome: nome,
+      usu_cpf: cpf,
+      usuarioEndereco: {
+        cep: cep,
+        rua: rua,
+        numero: numero,
+        complemento: referencia
+      },
+      usu_cidade: cidade,
+      usu_uf: estado,
+      tp_usu: "1"
+    }, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log('Resposta do servidor:', response.data);
+      setCep('');
+      setRua('');
+      setBairro('');
+      setCidade('');
+      setEstado('');
+      setNome('');
+      setIdade('');
+      setTelefone('');
+      setPeriodoSelecionado('');
+      setNumero('');
+      setReferencia('');
+      setEscolaSelecionada('');
+      setCpf(''); // Reset CPF field
+      setCepDone(false);
+      setCamposVazios([]);
+      if (numeroInputRef.current) {
+        numeroInputRef.current.blur();
+      }
+      Alert.alert('Usuário cadastrado com sucesso');
+    })
+    .catch(error => {
+      console.error('Erro ao cadastrar usuário:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao cadastrar o usuário. Por favor, tente novamente.');
+    });
+  };
 
-    setCep('');
-    setRua('');
-    setBairro('');
-    setCidade('');
-    setEstado('');
-    setNome('');
-    setIdade('');
-    setTelefone('');
-    setPeriodoSelecionado('');
-    setNumero('');
-    setReferencia('');
-    setEscolaSelecionada('');
-    setCepDone(false);
-    setCamposVazios([]);
-    
-    if (numeroInputRef.current) {
-      numeroInputRef.current.blur();
+  const fetchEscolas = async () => {
+    try {
+      const response = await axios.get('http://10.0.2.2:3001/escola/');
+      console.log('Resposta da API de escolas:', response.data); // Adicione este log
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar escolas:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao buscar as escolas. Por favor, tente novamente.');
+      return [];
     }
+  };
+
+  const handleOpenModalEscola = async () => {
+    const fetchedEscolas = await fetchEscolas();
+    setEscolas(fetchedEscolas);
+    console.log('Escolas buscadas:', fetchedEscolas); // Adicione este log
+    setModalEscolaVisible(true);
   };
 
   return (
@@ -123,6 +167,14 @@ const CadastroAluno = () => {
             onChangeText={formatPhoneNumber}
             keyboardType="phone-pad"
             maxLength={15}
+          />
+          <TextInput
+            style={[styles.input, camposVazios.includes('CPF') && styles.inputError]}
+            placeholder="CPF do aluno"
+            value={cpf}
+            onChangeText={setCpf}
+            keyboardType="numeric"
+            maxLength={11}
           />
           <TextInput
             style={[styles.input, camposVazios.includes('CEP') && styles.inputError]}
@@ -183,7 +235,7 @@ const CadastroAluno = () => {
             value={referencia}
             onChangeText={setReferencia}
           />
-          <TouchableOpacity style={[styles.input, camposVazios.includes('Escola') && styles.inputError]} onPress={() => setModalEscolaVisible(true)}>
+          <TouchableOpacity style={[styles.input, camposVazios.includes('Escola') && styles.inputError]} onPress={handleOpenModalEscola}>
             <Text style={styles.periodoButtonText}>Escola: {escolaSelecionada ? escolaSelecionada : 'Selecione uma escola'}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.input, camposVazios.includes('Período') && styles.inputError]} onPress={() => setModalPeriodoVisible(true)}>
@@ -193,42 +245,43 @@ const CadastroAluno = () => {
             <Text style={styles.buttonText}>Cadastrar</Text>
           </TouchableOpacity>
           <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalEscolaVisible}
-            onRequestClose={() => {
-              setModalEscolaVisible(false);
-            }}
-          >
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => {
-                    setEscolaSelecionada('Dom Pedro');
-                    setModalEscolaVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalButtonText}>Dom Pedro</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => {
-                    setEscolaSelecionada('São Lucas');
-                    setModalEscolaVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalButtonText}>São Lucas</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => setModalEscolaVisible(false)}
-                >
-                  <Text style={styles.modalButtonText}>Cancelar</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
+  animationType="slide"
+  transparent={true}
+  visible={modalEscolaVisible}
+  onRequestClose={() => {
+    setModalEscolaVisible(false);
+  }}
+>
+  <View style={styles.centeredView}>
+    <View style={styles.modalView}>
+      <ScrollView style={{ maxHeight: 500 }}>
+        {escolas.length > 0 ? (
+          escolas.map((escola) => (
+            <TouchableOpacity
+              key={escola.id}
+              style={styles.modalButton}
+              onPress={() => {
+                setEscolaSelecionada(escola.es_desc);
+                setModalEscolaVisible(false);
+              }}
+            >
+              <Text style={styles.modalButtonText}>{escola.es_desc}</Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text>Nenhuma escola encontrada</Text>
+        )}
+      </ScrollView>
+      <TouchableOpacity
+        style={styles.modalButton}
+        onPress={() => setModalEscolaVisible(false)}
+      >
+        <Text style={styles.modalButtonText}>Cancelar</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
           <Modal
             animationType="slide"
             transparent={true}
@@ -239,24 +292,18 @@ const CadastroAluno = () => {
           >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => {
-                    setPeriodoSelecionado('Manhã');
-                    setModalPeriodoVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalButtonText}>Manhã</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => {
-                    setPeriodoSelecionado('Tarde');
-                    setModalPeriodoVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalButtonText}>Tarde</Text>
-                </TouchableOpacity>
+                {['Manhã', 'Tarde'].map((periodo, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.modalButton}
+                    onPress={() => {
+                      setPeriodoSelecionado(periodo);
+                      setModalPeriodoVisible(false);
+                    }}
+                  >
+                    <Text style={styles.modalButtonText}>{periodo}</Text>
+                  </TouchableOpacity>
+                ))}
                 <TouchableOpacity
                   style={styles.modalButton}
                   onPress={() => setModalPeriodoVisible(false)}

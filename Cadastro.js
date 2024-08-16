@@ -10,8 +10,15 @@ const Cadastro = ({ navigation }) => {
     navigation.navigate('CadastroAluno');
   };
 
+  const irParaAlunosCadastrados = () => {
+    navigation.navigate('AlunosCadastrados');
+  };
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.buttonAlunosCadastrados} onPress={irParaAlunosCadastrados}>
+        <Text style={styles.buttonText}>Alunos cadastrados</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Escolha o tipo de cadastro:</Text>
       <TouchableOpacity style={styles.button} onPress={irParaCadastroEscola}>
         <Text style={styles.buttonText}>Cadastro Escola</Text>
@@ -39,6 +46,12 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+  },
+  buttonAlunosCadastrados: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
   },
   buttonText: {
     color: '#ffffff',
